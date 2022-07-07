@@ -1,0 +1,26 @@
+#!/bin/bash -ex
+
+# Setup basic variables before importing lib/ekb.sh
+export EKB_SRC_DIR=$(readlink -f "$(dirname $0)")
+export EKB_DATA_DIR="${EKB_SRC_DIR}/data"
+export EKB_LIB_DIR="${EKB_SRC_DIR}/lib"
+export EKB_STAGES_DIR="${EKB_SRC_DIR}/stages"
+export EKB_BASELIB="${EKB_LIB_DIR}/ekb.sh"
+
+# Temporary hard-coded configuration
+# TODO: move this out to proper configuration files
+export EKB_WORK_DIR="/tmp/endless-key-builder"
+export EKB_CONTENT_DIR="${EKB_WORK_DIR}/content"
+export EKB_TARGET_DIR="${EKB_WORK_DIR}/target"
+export EKB_TMP_DIR="${EKB_WORK_DIR}/tmp"
+
+
+. ${EKB_BASELIB}
+
+# Create work dirs
+ekb_recreate_dir "${EKB_CONTENT_DIR}"
+ekb_recreate_dir "${EKB_TARGET_DIR}"
+ekb_recreate_dir "${EKB_TMP_DIR}"
+
+# Run stages
+${EKB_STAGES_DIR}/ekb_content
