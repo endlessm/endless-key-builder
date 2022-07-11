@@ -155,3 +155,35 @@ for channel_id in ${EKB_KOLIBRI_INSTALL_CHANNELS}; do
   kolibri manage setchannelposition ${channel_id} ${position} || true
   let position=position+1
 done
+
+
+## hooks/image/62-endless-key-kolibri-content-swap-placeholders
+
+swap_placeholder() {
+  local content_id=${1:?No content_id supplied to ${FUNCNAME}}
+  local download_url=${2:?No download_url supplied to ${FUNCNAME}}
+  local placeholder_file="${KOLIBRI_HOME}/content/storage/${content_id:0:1}/${content_id:1:1}/${content_id}"
+
+  if [ -f "${placeholder_file}" ]; then
+    ekb_download_file "${download_url}" "${EKB_TMP_DIR}/${content_id}"
+    cp -f "${EKB_TMP_DIR}/${content_id}" "${placeholder_file}"
+  fi
+}
+
+swap_placeholder_by_id() {
+  local placeholder_id=${1//[^[:alnum:]]/_}
+
+  local placeholder_filename_var="EKB_KOLIBRI_PLACEHOLDER_${placeholder_id^^}_STORAGE_FILENAME"
+  local placeholder_download_url_var="EKB_KOLIBRI_PLACEHOLDER_${placeholder_id^^}_DOWNLOAD_URL"
+
+  if [ -n "${!placeholder_filename_var}" ] && [ -n "${!placeholder_download_url_var}" ]; then
+    swap_placeholder "${!placeholder_filename_var}" "${!placeholder_download_url_var}"
+  fi
+}
+
+# Replace placeholder zim files with the real ones
+if [ -n "${EKB_KOLIBRI_CONTENT_PLACEHOLDERS}" ]; then
+  for placeholder_id in ${EKB_KOLIBRI_CONTENT_PLACEHOLDERS}; do
+    swap_placeholder_by_id "${placeholder_id}"
+  done
+fi
