@@ -12,6 +12,7 @@ export EKB_BASELIB="${EKB_LIB_DIR}/ekb.sh"
 # TODO: move this out to proper configuration files
 export EKB_WORK_DIR="/tmp/endless-key-builder"
 export EKB_CONTENT_DIR="${EKB_WORK_DIR}/content"
+export EKB_KOLIBRI_CONTENT_DIR="${EKB_CONTENT_DIR}/kolibri-content"
 export EKB_TARGET_DIR="${EKB_WORK_DIR}/target"
 export EKB_TMP_DIR="${EKB_WORK_DIR}/tmp"
 
@@ -51,3 +52,4 @@ ekb_recreate_dir "${EKB_TMP_DIR}"
 
 # Run stages
 ${EKB_STAGES_DIR}/ekb_content
+${EKB_STAGES_DIR}/ekb_install
