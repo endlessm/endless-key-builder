@@ -16,6 +16,7 @@ export EKB_KOLIBRI_CONTENT_DIR="${EKB_CONTENT_DIR}/kolibri-content"
 export EKB_TARGET_DIR="${EKB_WORK_DIR}/target"
 export EKB_TMP_DIR="${EKB_WORK_DIR}/tmp"
 
+export EKB_AUTORUN_LABEL="Endless Key"
 export EKB_KOLIBRI_CENTRAL_CONTENT_BASE_URL="https://kolibri-content.endlessos.org"
 export EKB_KOLIBRI_INSTALL_CHANNELS="
   3160899a73564d8a8467284d9219b91c

@@ -26,3 +26,18 @@ if [ -n "${EKB_KOLIBRI_INSTALL_CHANNELS}" ]; then
   mv "${EKB_KOLIBRI_CONTENT_DIR}/extensions" "${kolibri_data_dir}"
   mv "${EKB_KOLIBRI_CONTENT_DIR}" "${kolibri_data_dir}/preseeded_kolibri_home"
 fi
+
+
+## Autorun info
+launcher_name="Endless Key Launcher.exe"
+sed 's/$/\r/' <<AUTORUN_INF | iconv -f utf-8 -t utf-16 > "${EKB_TARGET_DIR}/autorun.inf"
+[AutoRun]
+label=${EKB_AUTORUN_LABEL}
+icon=${launcher_name}
+open=${launcher_name}
+
+[Content]
+MusicFiles=false
+PictureFiles=false
+VideoFiles=false
+AUTORUN_INF
