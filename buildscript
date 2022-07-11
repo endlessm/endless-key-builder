@@ -3,6 +3,7 @@
 # Setup basic variables before importing lib/ekb.sh
 export EKB_SRC_DIR=$(readlink -f "$(dirname $0)")
 export EKB_DATA_DIR="${EKB_SRC_DIR}/data"
+export EKB_HELPERS_DIR="${EKB_SRC_DIR}/helpers"
 export EKB_LIB_DIR="${EKB_SRC_DIR}/lib"
 export EKB_STAGES_DIR="${EKB_SRC_DIR}/stages"
 export EKB_BASELIB="${EKB_LIB_DIR}/ekb.sh"

@@ -1,0 +1,33 @@
+#!/usr/bin/python3
+
+# Generate search index files for Zimply
+
+import os
+import sys
+
+import logging
+logging.getLogger().setLevel(logging.INFO)
+
+from zimply_core.zim_core import ZIMFile
+from zimply_core.zim_core import CreateFTSThread
+from zimply_core.zim_core import Queue
+
+if len(sys.argv) < 2:
+    sys.exit(0)
+
+zim_filename = sys.argv[1]
+zim_file = ZIMFile(zim_filename, encoding="utf-8")
+
+index_filename = os.path.splitext(zim_file._filename)[0] + ".idx"
+
+queue = Queue()
+thread = CreateFTSThread(queue, index_filename, zim_file, auto_delete=True)
+thread.start()
+
+success = queue.get()
+
+if not success:
+    logging.info("Error starting indexer thread")
+    sys.exit(1)
+
+thread.join()
