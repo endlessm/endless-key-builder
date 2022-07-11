@@ -43,3 +43,51 @@ endless_key_usb_image_workspace() {
 }
 
 endless_key_usb_image_workspace "$@"
+
+
+# Exit here if we are not installing Kolibri channels
+if [ -z "${EKB_KOLIBRI_INSTALL_CHANNELS}" ]; then
+  exit 0
+fi
+
+
+## hooks/image/60-endless-key-kolibri-tmp-venv
+
+# Populate the Kolibri home directory
+PYPI_KOLIBRI_VERSION=kolibri==0.15.3
+PYPI_EXPLORE_PLUGIN_VERSION=kolibri-explore-plugin==2.0.14
+PYPI_ZIM_PLUGIN_VERSION=kolibri-zim-plugin
+
+kolibri_explore_plugin_tag="v2.0.14"
+
+export KOLIBRI_HOME="${EKB_CONTENT_DIR}/kolibri-content"
+ekb_recreate_dir "${KOLIBRI_HOME}"
+
+apps_url=$(
+  curl -sSL https://api.github.com/repos/endlessm/kolibri-explore-plugin/releases/tags/${kolibri_explore_plugin_tag} |
+  jq -r '.assets[] | select(.name == "apps-bundle.zip") | .browser_download_url'
+)
+
+KOLIBRI_VENV_DIR="${EKB_TMP_DIR}/kolibri-content-venv"
+python3 -m venv ${KOLIBRI_VENV_DIR}
+source ${KOLIBRI_VENV_DIR}/bin/activate
+
+cp "${EKB_DATA_DIR}/kolibri/options.ini" "${EKB_DATA_DIR}/kolibri/automatic_provision.json" -t "${KOLIBRI_HOME}"
+
+pip install ${PYPI_KOLIBRI_VERSION}
+pip install ${PYPI_EXPLORE_PLUGIN_VERSION}
+pip install ${PYPI_ZIM_PLUGIN_VERSION}
+
+kolibri plugin enable kolibri.plugins.app
+kolibri plugin disable kolibri.plugins.learn
+kolibri plugin enable kolibri_explore_plugin
+kolibri plugin enable kolibri_zim_plugin
+
+# Install the explore plugin and zim plugin in ${KOLIBRI_HOME}/extensions.
+# The zim plugin is bundled with the application.
+pip install ${PYPI_EXPLORE_PLUGIN_VERSION} --target="${KOLIBRI_HOME}/extensions" --platform=win_amd64 --only-binary=:all:
+pip install ${PYPI_ZIM_PLUGIN_VERSION} --target="${KOLIBRI_HOME}/extensions" --platform=win_amd64 --only-binary=:all:
+
+# Install apps bundle
+ekb_download_file "${apps_url}" "${EKB_TMP_DIR}/apps-bundle.zip"
+unzip -o -d "${KOLIBRI_HOME}/extensions/kolibri_explore_plugin" "${EKB_TMP_DIR}/apps-bundle.zip"

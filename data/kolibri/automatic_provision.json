@@ -1,0 +1,11 @@
+{
+  "facility": "Endless Key",
+  "superusername": "admin",
+  "superuserpassword": "admin",
+  "preset": "nonformal",
+  "facility_settings": {},
+  "device_settings": {
+    "landing_page": "learn",
+    "allow_other_browsers_to_connect": 0
+  }
+}

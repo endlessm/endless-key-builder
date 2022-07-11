@@ -14,6 +14,7 @@ export EKB_CONTENT_DIR="${EKB_WORK_DIR}/content"
 export EKB_TARGET_DIR="${EKB_WORK_DIR}/target"
 export EKB_TMP_DIR="${EKB_WORK_DIR}/tmp"
 
+export EKB_KOLIBRI_INSTALL_CHANNELS=1
 
 . ${EKB_BASELIB}
 
