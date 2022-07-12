@@ -24,7 +24,7 @@ cp "${EKB_DATA_DIR}/kolibri/options.ini" "${EKB_DATA_DIR}/kolibri/automatic_prov
 
 pip install "kolibri==${EKB_KOLIBRI_VERSION}"
 pip install "kolibri-explore-plugin==${EKB_KOLIBRI_EXPLORE_PLUGIN_VERSION}"
-pip install "kolibri-zim-plugin"
+pip install "kolibri-zim-plugin==${EKB_KOLIBRI_ZIM_PLUGIN_VERSION}"
 
 kolibri plugin enable kolibri.plugins.app
 kolibri plugin disable kolibri.plugins.learn
@@ -34,7 +34,7 @@ kolibri plugin enable kolibri_zim_plugin
 # Install the explore plugin and zim plugin in ${KOLIBRI_HOME}/extensions.
 # The zim plugin is bundled with the application.
 pip install "kolibri-explore-plugin==${EKB_KOLIBRI_EXPLORE_PLUGIN_VERSION}" --target="${KOLIBRI_HOME}/extensions" --platform=win_amd64 --only-binary=:all:
-pip install "kolibri-zim-plugin" --target="${KOLIBRI_HOME}/extensions" --platform=win_amd64 --only-binary=:all:
+pip install "kolibri-zim-plugin==${EKB_KOLIBRI_ZIM_PLUGIN_VERSION}" --target="${KOLIBRI_HOME}/extensions" --platform=win_amd64 --only-binary=:all:
 
 # Install apps bundle
 ekb_download_file "${apps_url}" "${EKB_TMP_DIR}/apps-bundle.zip"
