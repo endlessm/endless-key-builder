@@ -49,3 +49,15 @@ ekb_compress_dir() {
   esac
   popd
 }
+
+# Create a detached checksum with sha256sum. By default the target in
+# the checksum file is the basename of the file being checksummed.
+ekb_checksum() {
+  local file=${1:?No file supplied to ${FUNCNAME}}
+  local outfile=${2:-${file}.sha256}
+  local target=${3:-${file##*/}}
+  local checksum
+
+  checksum=$(sha256sum "${file}" | cut -d' ' -f1)
+  echo "${checksum}  ${target}" > "${outfile}"
+}
