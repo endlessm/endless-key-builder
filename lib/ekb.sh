@@ -34,3 +34,18 @@ ekb_download_file() {
     ekb_retry curl "${curl_args[@]}" "${url}"
   fi
 }
+
+# Compress a directory according to the configured compression type.
+ekb_compress_dir() {
+  pushd "${1}"
+  case "${EKB_COMPRESSION}" in
+    zip)
+      zip --recurse-paths "${2}" .
+      ;;
+    *)
+      echo "Unrecognized image compression ${EKB_COMPRESSION}" >&2
+      return 1
+      ;;
+  esac
+  popd
+}
