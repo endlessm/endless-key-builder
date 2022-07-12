@@ -3,31 +3,6 @@
 . ${EKB_BASELIB}
 
 
-## hooks/image/70-endless-key-kolibri-content-install
-if [ -n "${EKB_KOLIBRI_INSTALL_CHANNELS}" ]; then
-  KOLIBRI_VENV_DIR="${EKB_TMP_DIR}/kolibri-content-venv"
-  python3 -m venv ${KOLIBRI_VENV_DIR}
-  source ${KOLIBRI_VENV_DIR}/bin/activate
-
-  # Empty the user database, and ensure that each instance of this image has a
-  # unique Facility ID.
-  # <https://kolibri.readthedocs.io/en/latest/install/provision.html#prepare-the-kolibri-folder-for-copying>
-  (echo yes; echo yes) | env KOLIBRI_HOME="${EKB_KOLIBRI_CONTENT_DIR}" ${KOLIBRI_VENV_DIR}/bin/kolibri manage deprovision
-
-  # Clean local data
-  rm -rf "${EKB_KOLIBRI_CONTENT_DIR}/process_cache"
-  rm -rf "${EKB_KOLIBRI_CONTENT_DIR}/logs"
-  rm -rf "${EKB_KOLIBRI_CONTENT_DIR}/sessions"
-
-  # Install the Kolibri home directory to the right location
-  kolibri_data_dir="${EKB_TARGET_DIR}/KOLIBRI_DATA"
-  ekb_recreate_dir ${kolibri_data_dir}
-  mv "${EKB_KOLIBRI_CONTENT_DIR}/content" "${kolibri_data_dir}"
-  mv "${EKB_KOLIBRI_CONTENT_DIR}/extensions" "${kolibri_data_dir}"
-  mv "${EKB_KOLIBRI_CONTENT_DIR}" "${kolibri_data_dir}/preseeded_kolibri_home"
-fi
-
-
 ## Autorun info
 launcher_name="Endless Key Launcher.exe"
 sed 's/$/\r/' <<AUTORUN_INF | iconv -f utf-8 -t utf-16 > "${EKB_TARGET_DIR}/autorun.inf"
