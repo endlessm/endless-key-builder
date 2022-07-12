@@ -131,7 +131,7 @@ endless_key_kolibri_content_generate_zim_index "$@"
 # Empty the user database, and ensure that each instance of this image has a
 # unique Facility ID.
 # <https://kolibri.readthedocs.io/en/latest/install/provision.html#prepare-the-kolibri-folder-for-copying>
-(echo yes; echo yes) | env KOLIBRI_HOME="${KOLIBRI_HOME}" ${KOLIBRI_VENV_DIR}/bin/kolibri manage deprovision
+(echo yes; echo yes) | ${KOLIBRI_VENV_DIR}/bin/kolibri manage deprovision
 
 # Clean local data
 rm -rf "${KOLIBRI_HOME}/process_cache"
