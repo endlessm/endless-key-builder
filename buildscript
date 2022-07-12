@@ -57,5 +57,4 @@ ekb_recreate_dir "${EKB_TMP_DIR}"
 # Run stages
 ${EKB_STAGES_DIR}/ekb_content
 ${EKB_STAGES_DIR}/ekb_kolibri
-${EKB_STAGES_DIR}/ekb_install
 ${EKB_STAGES_DIR}/ekb_archive

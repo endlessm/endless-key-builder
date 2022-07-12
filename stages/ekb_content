@@ -54,3 +54,18 @@ launcher_url=$(
 )
 ekb_download_file "${launcher_url}" "${EKB_CONTENT_DIR}/Endless Key Launcher.exe"
 cp "${EKB_CONTENT_DIR}/Endless Key Launcher.exe" "${EKB_TARGET_DIR}/Endless Key Launcher.exe"
+
+
+## Autorun info
+launcher_name="Endless Key Launcher.exe"
+sed 's/$/\r/' <<AUTORUN_INF | iconv -f utf-8 -t utf-16 > "${EKB_TARGET_DIR}/autorun.inf"
+[AutoRun]
+label=${EKB_AUTORUN_LABEL}
+icon=${launcher_name}
+open=${launcher_name}
+
+[Content]
+MusicFiles=false
+PictureFiles=false
+VideoFiles=false
+AUTORUN_INF
