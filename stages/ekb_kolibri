@@ -11,11 +11,6 @@ fi
 export KOLIBRI_HOME="${EKB_CONTENT_DIR}/kolibri-content"
 ekb_recreate_dir "${KOLIBRI_HOME}"
 
-apps_url=$(
-  curl -sSL https://api.github.com/repos/endlessm/kolibri-explore-plugin/releases/tags/v${EKB_KOLIBRI_EXPLORE_PLUGIN_VERSION} |
-  jq -r '.assets[] | select(.name == "apps-bundle.zip") | .browser_download_url'
-)
-
 KOLIBRI_VENV_DIR="${EKB_TMP_DIR}/kolibri-content-venv"
 python3 -m venv ${KOLIBRI_VENV_DIR}
 source ${KOLIBRI_VENV_DIR}/bin/activate
@@ -37,6 +32,10 @@ pip install "kolibri-explore-plugin==${EKB_KOLIBRI_EXPLORE_PLUGIN_VERSION}" --ta
 pip install "kolibri-zim-plugin==${EKB_KOLIBRI_ZIM_PLUGIN_VERSION}" --target="${KOLIBRI_HOME}/extensions" --platform=win_amd64 --only-binary=:all:
 
 # Install apps bundle
+apps_url=$(
+  curl -sSL https://api.github.com/repos/endlessm/kolibri-explore-plugin/releases/tags/v${EKB_KOLIBRI_EXPLORE_PLUGIN_VERSION} |
+  jq -r '.assets[] | select(.name == "apps-bundle.zip") | .browser_download_url'
+)
 ekb_download_file "${apps_url}" "${EKB_TMP_DIR}/apps-bundle.zip"
 unzip -o -d "${KOLIBRI_HOME}/extensions/kolibri_explore_plugin" "${EKB_TMP_DIR}/apps-bundle.zip"
 
