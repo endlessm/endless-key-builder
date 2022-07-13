@@ -1,65 +1,51 @@
-#!/bin/bash -ex
+#!/bin/bash -e
 
-# Setup basic variables before importing lib/ekb.sh
-export EKB_SRC_DIR=$(readlink -f "$(dirname $0)")
-export EKB_DATA_DIR="${EKB_SRC_DIR}/data"
-export EKB_HELPERS_DIR="${EKB_SRC_DIR}/helpers"
-export EKB_LIB_DIR="${EKB_SRC_DIR}/lib"
-export EKB_STAGES_DIR="${EKB_SRC_DIR}/stages"
-export EKB_BASELIB="${EKB_LIB_DIR}/ekb.sh"
+# Ensure basic settings are available from the environment.
+fatal=0
+for var in \
+  EKB_BASELIB \
+  EKB_DATA_DIR \
+  EKB_HELPERS_DIR \
+  EKB_STAGES_DIR \
+  EKB_CONTENT_DIR \
+  EKB_TARGET_DIR \
+  EKB_TMP_DIR \
+  EKB_OUT_FILE \
+  EKB_COMPRESSION
+do
+  if [ ! -v $var ]; then
+    echo "error: required setting $var not set" >&2
+    fatal=1
+  fi
+done
 
-# Temporary hard-coded configuration
-# TODO: move this out to proper configuration files
-export EKB_WORK_DIR="/tmp/endless-key-builder"
-export EKB_CONTENT_DIR="${EKB_WORK_DIR}/content"
-export EKB_TARGET_DIR="${EKB_WORK_DIR}/target"
-export EKB_TMP_DIR="${EKB_WORK_DIR}/tmp"
+# Warn for other (non-fatal) missing settings
+for var in \
+  EKB_USB_LABEL \
+  EKB_USB_SIZE \
+  EKB_KOLIBRI_VERSION \
+  EKB_KOLIBRI_EXPLORE_PLUGIN_VERSION \
+  EKB_KOLIBRI_ZIM_PLUGIN_VERSION \
+  EKB_KOLIBRI_ENDLESS_KEY_APP_VERSION \
+  EKB_KOLIBRI_LAUNCHER_WINDOWS_VERSION \
+  EKB_KOLIBRI_CENTRAL_CONTENT_BASE_URL \
+  EKB_KOLIBRI_INSTALL_CHANNELS \
+  EKB_KOLIBRI_CONTENT_PLACEHOLDERS
+do
+  if [ ! -v $var ]; then
+    echo "warn: missing setting $var" >&2
+  fi
+done
 
-export EKB_OUT_FILE="${EKB_WORK_DIR}/endless-key.zip"
-export EKB_COMPRESSION="zip"
-export EKB_AUTORUN_LABEL="Endless Key"
-export EKB_MAX_SIZE="128"
+if [ $fatal -eq 1 ] ; then
+  echo "error: one or more required settings missing, exiting" >&2
+  exit 1
+fi
 
-export EKB_ENDLESS_KEY_APP_VERSION="0.1.10"
-export EKB_WIN_USB_LAUNCHER_VERSION="3.9.2.0"
-
-export EKB_KOLIBRI_VERSION="0.15.3"
-export EKB_KOLIBRI_EXPLORE_PLUGIN_VERSION="2.0.14"
-export EKB_KOLIBRI_ZIM_PLUGIN_VERSION="1.3.1"
-
-export EKB_KOLIBRI_CENTRAL_CONTENT_BASE_URL="https://kolibri-content.endlessos.org"
-export EKB_KOLIBRI_INSTALL_CHANNELS="
-  3160899a73564d8a8467284d9219b91c
-  f62db29be20453c4a267132e93a9e602
-"
-# Terminal Two
-export EKB_KOLIBRI_3160899A73564D8A8467284D9219B91C_INCLUDE_NODE_IDS="
-  4090404b5c554fb3a13254be2d7421e2
-  35f9b9934b66441588395daea124208a
-  7e1462e9ab1349e08a71c63fa79830f0
-  edd45496bd024c288e363afc82a26abb
-  d5ee8f152eea4fd68eea554993ed50d5
-  b326d51cb4c1431aa67321d1a8c336f7
-  e728b908f9a24692b33c788cec204e79
-  d5f2e0616c9a4bd6a97b3cf2a7409867
-"
-# Wikipedia
-export EKB_KOLIBRI_F62DB29BE20453C4A267132E93A9E602_INCLUDE_NODE_IDS="
-  ddd7dac476255acd8adffdac28502b49
-"
-export EKB_KOLIBRI_CONTENT_PLACEHOLDERS="
-  wikipedia_en_endless_maxi
-"
-export EKB_KOLIBRI_PLACEHOLDER_WIKIPEDIA_EN_ENDLESS_MAXI_STORAGE_FILENAME="4cffecfe89419c37771675bdc9bf2842.zim"
-export EKB_KOLIBRI_PLACEHOLDER_WIKIPEDIA_EN_ENDLESS_MAXI_DOWNLOAD_URL="https://key.dev.endlessos.org/wikizim/wikipedia_simple_endless_maxi_2022-03.zim"
-
+# Set -ex here so we don't get all the output from the loops above
+set -ex
 
 . ${EKB_BASELIB}
-
-# Create work dirs
-ekb_recreate_dir "${EKB_CONTENT_DIR}"
-ekb_recreate_dir "${EKB_TARGET_DIR}"
-ekb_recreate_dir "${EKB_TMP_DIR}"
 
 # Run stages
 ${EKB_STAGES_DIR}/ekb_content

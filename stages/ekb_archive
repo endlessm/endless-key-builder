@@ -6,8 +6,8 @@
 ## Check max sixe
 size=$(du --block-size=1 -s "${EKB_TARGET_DIR}")
 size=${size%$'\t'*}
-if [[ "${EKB_MAX_SIZE}" ]] && (( size > EKB_MAX_SIZE * 1000**3 * 96 / 100 )); then
-  echo "ERROR: target size ${size} exceeds 96% of ${EKB_MAX_SIZE} GB" >&2
+if [[ "${EKB_USB_SIZE}" ]] && (( size > EKB_USB_SIZE * 1000**3 * 96 / 100 )); then
+  echo "ERROR: target size ${size} exceeds 96% of ${EKB_USB_SIZE} GB" >&2
   return 1
 fi
 

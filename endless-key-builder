@@ -1,0 +1,240 @@
+#!/usr/bin/python3
+# -*- mode: Python; coding: utf-8 -*-
+
+from argparse import ArgumentParser
+import configparser
+from collections import OrderedDict
+import datetime
+import os
+import re
+import shutil
+import subprocess
+import sys
+
+
+desc = 'Generates a file for creating an Endless Key USB device'
+
+
+def recreate_dir(path):
+    """Delete and recreate a directory"""
+    shutil.rmtree(path, ignore_errors=True)
+    os.makedirs(path, exist_ok=True)
+
+
+class EKBConfigParser(configparser.ConfigParser):
+    """EKB Configuration parser. This uses configparser's
+    ExtendedInterpolation to expand values like variables."""
+
+    defaultsect = 'build'
+
+    def __init__(self, *args, **kwargs):
+        kwargs['interpolation'] = configparser.ExtendedInterpolation()
+        kwargs['default_section'] = self.defaultsect
+        super().__init__(*args, **kwargs)
+
+    def items_no_default(self, section, raw=False):
+        """Return the items in a section without including defaults"""
+        # This is a nasty hack to overcome the behavior of the normal
+        # items(). The default section needs to be merged in to resolve
+        # the interpolation, but we only want the keys from the section
+        # itself.
+        d = self.defaults().copy()
+        sect = self._sections[section]
+        d.update(sect)
+        if raw:
+            def value_getter(option):
+                return d[option]
+        else:
+            def value_getter(option):
+                return self._interpolation.before_get(self,
+                                                      section,
+                                                      option,
+                                                      d[option],
+                                                      d)
+        return [(option, value_getter(option)) for option in sect.keys()]
+
+    def setboolean(self, section, option, value):
+        """Convenience method to store boolean's in shell style
+        true/false
+        """
+        assert(isinstance(value, bool))
+        if value:
+            value = 'true'
+        else:
+            value = 'false'
+        self.set(section, option, value)
+
+
+class EKB(object):
+    # Attributes to be exported to environment
+    CONFIG_ATTRS = [
+        'codename',
+        'build_version',
+        'src_dir',
+        'helpers_dir',
+        'stages_dir',
+        'baselib',
+        'data_dir',
+        'configdir',
+        'sysconfdir',
+        'userconfdir',
+        'build_dir',
+        'tmp_dir',
+        'content_dir',
+        'target_dir',
+        'out_dir',
+        'compression',
+        'out_file',
+        'configfile',
+        'configfullfile',
+    ]
+    BOOLEAN_ATTRS = ['dry_run']
+
+    def __getattr__(self, attr):
+        """Proxy this object's attributes into the config object"""
+        if attr in self.CONFIG_ATTRS:
+            # Proxy through to the config object's default section
+            if attr in self.BOOLEAN_ATTRS:
+                return self.config.getboolean(self.config.defaultsect,
+                                              attr)
+            return self.config.get(self.config.defaultsect, attr)
+        else:
+            # Chain up for normal attribute access
+            return super().__getattribute__(attr)
+
+    def __setattr__(self, attr, value):
+        """Proxy the value to the config object"""
+        if attr in self.CONFIG_ATTRS:
+            # Proxy through to the config object's default section
+            if attr in self.BOOLEAN_ATTRS:
+                self.config.setboolean(None, attr, value)
+            else:
+                self.config.set(None, attr, value)
+        else:
+            # Chain up for normal attribute setting
+            super().__setattr__(attr, value)
+
+    def __init__(self, codename, debug=False):
+        self.debug = debug
+
+        # Create the config option first to allow the proxying between
+        # it and this object's attributes.
+        self.config = EKBConfigParser()
+
+        # Load other common settings, but use the configparser
+        # interpolation syntax. This will allow the user to override
+        # things easily.
+
+        self.codename = codename
+        self.build_version = datetime.datetime.utcnow().strftime('%y%m%d-%H%M%S')
+
+        self.src_dir = os.path.dirname(os.path.realpath(__file__))
+        self.helpers_dir = '${src_dir}/helpers'
+        self.stages_dir = '${src_dir}/stages'
+        self.baselib = '${src_dir}/lib/ekb.sh'
+        self.data_dir = '${src_dir}/data'
+
+        self.configdir = '${src_dir}/config'
+        self.sysconfdir = '/etc/endless-key-builder'
+        self.userconfdir = f'{os.path.expanduser("~")}/.config/endless-key-builder'
+
+        self.build_dir = '${src_dir}/build'
+        self.tmp_dir = '${build_dir}/tmp'
+        self.content_dir = '${build_dir}/content'
+        self.target_dir = '${build_dir}/target'
+        self.out_dir = '${build_dir}/out/${build_version}'
+
+        self.compression = 'zip'
+        self.out_file = '${out_dir}/endless-key-${codename}_${build_version}.${compression}'
+        self.configfile = '${out_dir}/config.ini'
+        self.configfullfile = '${tmp_dir}/config_full.ini'
+
+    def configure(self):
+        """Build settings from configuration files"""
+
+        config_files = [
+            # Default settings
+            os.path.join(self.configdir, 'defaults.ini'),
+            # Codename settings
+            os.path.join(self.configdir, 'codename', f'{self.codename}.ini'),
+            # Host settings
+            os.path.join(self.sysconfdir, 'config.ini'),
+            # User settings
+            os.path.join(self.userconfdir, 'config.ini'),
+        ]
+        for path in self.config.read(config_files, encoding='utf-8'):
+            print(f'Loaded configuration file {path}')
+        with open(self.configfile, 'w') as out:
+            out.write(f'# Configuration for {os.path.basename(self.out_file)}\n')
+            self.config.write(out)
+
+        # Additional settings that will not be displayed in the merged
+        # configuration file. Useful for credentials and other secrets.
+        config_files = [
+            # Host settings
+            os.path.join(self.sysconfdir, 'private.ini'),
+            # User settings
+            os.path.join(self.userconfdir, 'private.ini'),
+        ]
+        for path in self.config.read(config_files, encoding='utf-8'):
+            print(f'Loaded private configuration file {path}')
+        with open(self.configfullfile, 'w') as out:
+            out.write(f'# Configuration for {os.path.basename(self.out_file)}\n')
+            self.config.write(out)
+
+    def setenv(self, section, option, value):
+        """Export config values as variable in EKB namespace
+
+        The variable name will be EKB_<SECTION>_<OPTION> with the
+        section and option names uppercased. Shell-incompatible
+        characters are converted to underscores.
+        """
+        # Convert boolean's to true/false to be handled easily in shell
+        if value in ['True', 'False']:
+            value = value.lower()
+        var = 'EKB_'
+        if section:
+            var += section.upper() + '_'
+        var += option.upper()
+
+        # Per POSIX, environment variable names compatible with shells
+        # only contain upper case letters, digits and underscores.
+        # Convert anything else to an underscore.
+        var = re.sub(r'[^A-Z0-9_]', '_', var)
+
+        os.environ[var] = value
+
+    def set_environment(self):
+        """Setup environment variables for stages and hooks"""
+        # Build specific environment attributes.
+        for option, value in self.config.items(self.config.defaultsect):
+            self.setenv(None, option, value)
+        for sect in self.config.sections():
+            for option, value in self.config.items_no_default(sect):
+                self.setenv(sect, option, value)
+
+    def run(self):
+        # Create necessary work directories
+        recreate_dir(self.content_dir)
+        recreate_dir(self.target_dir)
+        recreate_dir(self.tmp_dir)
+        recreate_dir(self.out_dir)
+
+        self.configure()
+        if self.debug:
+            self.config.write(sys.stdout)
+
+        self.set_environment()
+        buildscript = os.path.join(self.src_dir, 'buildscript')
+        subprocess.check_call(buildscript)
+
+
+if __name__ == '__main__':
+    argparser = ArgumentParser(description=desc)
+    argparser.add_argument('CODENAME', help='which configuration to build')
+    argparser.add_argument('--debug', help='enable debug output',
+                           action='store_true')
+    args = argparser.parse_args()
+
+    builder = EKB(codename=args.CODENAME, debug=args.debug)
+    builder.run()

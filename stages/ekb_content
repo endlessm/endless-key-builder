@@ -14,7 +14,7 @@ cp -rl "${EKB_CONTENT_DIR}/README.pdf" "${EKB_TARGET_DIR}/Quick Start Guide.pdf"
 ## Install Kolibri for Windows and DLL dependencies
 
 ekb_recreate_dir "${EKB_TARGET_DIR}/.kolibri-windows"
-ekb_download_github_release_file "endlessm/endless-key-app" "v${EKB_ENDLESS_KEY_APP_VERSION}" "kolibri-windows.zip" "${EKB_CONTENT_DIR}/kolibri-windows.zip"
+ekb_download_github_release_file "endlessm/endless-key-app" "v${EKB_KOLIBRI_ENDLESS_KEY_APP_VERSION}" "kolibri-windows.zip" "${EKB_CONTENT_DIR}/kolibri-windows.zip"
 # XXX: Note that VCRUNTIME140.dll needed by the USB launcher below comes from this ZIP
 unzip "${EKB_CONTENT_DIR}/kolibri-windows.zip" -d "${EKB_TARGET_DIR}/.kolibri-windows"
 cp ${EKB_DATA_DIR}/win7-dlls/*.dll ${EKB_TARGET_DIR}/
@@ -23,7 +23,7 @@ cp ${EKB_DATA_DIR}/win7-dlls/*.dll ${EKB_TARGET_DIR}/.kolibri-windows/resources/
 
 ## Install USB launcher and DLL dependencies
 
-ekb_download_github_release_file "endlessm/windows-usb-launcher" "v${EKB_WIN_USB_LAUNCHER_VERSION}" "Endless.Key.Launcher.exe" "${EKB_CONTENT_DIR}/Endless Key Launcher.exe"
+ekb_download_github_release_file "endlessm/windows-usb-launcher" "v${EKB_KOLIBRI_LAUNCHER_WINDOWS_VERSION}" "Endless.Key.Launcher.exe" "${EKB_CONTENT_DIR}/Endless Key Launcher.exe"
 cp "${EKB_CONTENT_DIR}/Endless Key Launcher.exe" "${EKB_TARGET_DIR}/Endless Key Launcher.exe"
 # XXX: VCRUNTIME140.dll comes from kolibri-windows.zip above
 cp "${EKB_TARGET_DIR}/.kolibri-windows/resources/app/src/Kolibri/VCRUNTIME140.dll" "${EKB_TARGET_DIR}/VCRUNTIME140.dll"
@@ -34,7 +34,7 @@ cp "${EKB_TARGET_DIR}/.kolibri-windows/resources/app/src/Kolibri/VCRUNTIME140.dl
 launcher_name="Endless Key Launcher.exe"
 sed 's/$/\r/' <<AUTORUN_INF | iconv -f utf-8 -t utf-16 > "${EKB_TARGET_DIR}/autorun.inf"
 [AutoRun]
-label=${EKB_AUTORUN_LABEL}
+label=${EKB_USB_LABEL}
 icon=${launcher_name}
 open=${launcher_name}
 
