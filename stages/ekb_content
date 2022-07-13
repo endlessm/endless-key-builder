@@ -2,10 +2,6 @@
 
 . ${EKB_BASELIB}
 
-
-## hooks/content/50-endless-key-usb-image-workspace
-
-# Fetch Windows programs, and other files, for Endless Key.
 readme_url=https://images-dl.endlessm.com/endless-key/README.pdf
 ek_app_version="v0.1.10"
 
@@ -43,9 +39,6 @@ endless_key_usb_image_workspace() {
 }
 
 endless_key_usb_image_workspace "$@"
-
-
-## from helpers/create-usb-image
 
 # Copy Windows launcher
 launcher_url=$(
