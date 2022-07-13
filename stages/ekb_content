@@ -4,27 +4,23 @@
 
 readme_url=https://images-dl.endlessm.com/endless-key/README.pdf
 
-endless_key_usb_image_workspace() {
-  # Download Software packages
-  ekb_download_file "$readme_url" "${EKB_CONTENT_DIR}/README.pdf"
-  ekb_download_github_release_file "endlessm/endless-key-app" "v${EKB_ENDLESS_KEY_APP_VERSION}" "kolibri-windows.zip" "${EKB_CONTENT_DIR}/kolibri-windows.zip"
+# Download Software packages
+ekb_download_file "$readme_url" "${EKB_CONTENT_DIR}/README.pdf"
+ekb_download_github_release_file "endlessm/endless-key-app" "v${EKB_ENDLESS_KEY_APP_VERSION}" "kolibri-windows.zip" "${EKB_CONTENT_DIR}/kolibri-windows.zip"
 
-  # Copy README
-  rm -f "${EKB_TARGET_DIR}/Quick Start Guide.pdf"
-  cp -rl "${EKB_CONTENT_DIR}/README.pdf" "${EKB_TARGET_DIR}/Quick Start Guide.pdf"
+# Copy README
+rm -f "${EKB_TARGET_DIR}/Quick Start Guide.pdf"
+cp -rl "${EKB_CONTENT_DIR}/README.pdf" "${EKB_TARGET_DIR}/Quick Start Guide.pdf"
 
-  # Copy Kolibri for Windows
-  ekb_recreate_dir "${EKB_TARGET_DIR}/.kolibri-windows"
-  unzip "${EKB_CONTENT_DIR}/kolibri-windows.zip" -d "${EKB_TARGET_DIR}/.kolibri-windows"
-  # Copy Launcher dll dependency from kolibri-windows to the root
-  cp "${EKB_TARGET_DIR}/.kolibri-windows/resources/app/src/Kolibri/VCRUNTIME140.dll" "${EKB_TARGET_DIR}/VCRUNTIME140.dll"
+# Copy Kolibri for Windows
+ekb_recreate_dir "${EKB_TARGET_DIR}/.kolibri-windows"
+unzip "${EKB_CONTENT_DIR}/kolibri-windows.zip" -d "${EKB_TARGET_DIR}/.kolibri-windows"
+# Copy Launcher dll dependency from kolibri-windows to the root
+cp "${EKB_TARGET_DIR}/.kolibri-windows/resources/app/src/Kolibri/VCRUNTIME140.dll" "${EKB_TARGET_DIR}/VCRUNTIME140.dll"
 
-  # Copy windows 7 Universal C Runtime compatibility DLLs
-  cp ${EKB_DATA_DIR}/win7-dlls/*.dll ${EKB_TARGET_DIR}/
-  cp ${EKB_DATA_DIR}/win7-dlls/*.dll ${EKB_TARGET_DIR}/.kolibri-windows/resources/app/src/Kolibri/
-}
-
-endless_key_usb_image_workspace "$@"
+# Copy windows 7 Universal C Runtime compatibility DLLs
+cp ${EKB_DATA_DIR}/win7-dlls/*.dll ${EKB_TARGET_DIR}/
+cp ${EKB_DATA_DIR}/win7-dlls/*.dll ${EKB_TARGET_DIR}/.kolibri-windows/resources/app/src/Kolibri/
 
 # Copy Windows launcher
 ekb_download_github_release_file "endlessm/windows-usb-launcher" "v${EKB_WIN_USB_LAUNCHER_VERSION}" "Endless.Key.Launcher.exe" "${EKB_CONTENT_DIR}/Endless Key Launcher.exe"
