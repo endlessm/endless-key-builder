@@ -3,7 +3,6 @@
 . ${EKB_BASELIB}
 
 readme_url=https://images-dl.endlessm.com/endless-key/README.pdf
-ek_app_version="v0.1.10"
 
 download_github_release_file() {
   local repo=${1:?No repo supplied to ${FUNCNAME}}
@@ -21,7 +20,7 @@ download_github_release_file() {
 endless_key_usb_image_workspace() {
   # Download Software packages
   ekb_download_file "$readme_url" "${EKB_CONTENT_DIR}/README.pdf"
-  download_github_release_file "endlessm/endless-key-app" "${ek_app_version}" "kolibri-windows.zip" "${EKB_CONTENT_DIR}/kolibri-windows.zip"
+  download_github_release_file "endlessm/endless-key-app" "v${EKB_ENDLESS_KEY_APP_VERSION}" "kolibri-windows.zip" "${EKB_CONTENT_DIR}/kolibri-windows.zip"
 
   # Copy README
   rm -f "${EKB_TARGET_DIR}/Quick Start Guide.pdf"
