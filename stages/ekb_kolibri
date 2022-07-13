@@ -15,8 +15,6 @@ KOLIBRI_VENV_DIR="${EKB_TMP_DIR}/kolibri-content-venv"
 python3 -m venv ${KOLIBRI_VENV_DIR}
 source ${KOLIBRI_VENV_DIR}/bin/activate
 
-cp "${EKB_DATA_DIR}/kolibri/options.ini" "${EKB_DATA_DIR}/kolibri/automatic_provision.json" -t "${KOLIBRI_HOME}"
-
 pip install "kolibri==${EKB_KOLIBRI_VERSION}"
 pip install "kolibri-explore-plugin==${EKB_KOLIBRI_EXPLORE_PLUGIN_VERSION}"
 pip install "kolibri-zim-plugin==${EKB_KOLIBRI_ZIM_PLUGIN_VERSION}"
@@ -39,9 +37,11 @@ apps_url=$(
 ekb_download_file "${apps_url}" "${EKB_TMP_DIR}/apps-bundle.zip"
 unzip -o -d "${KOLIBRI_HOME}/extensions/kolibri_explore_plugin" "${EKB_TMP_DIR}/apps-bundle.zip"
 
-# Populate the Kolibri home directory
+## Populate KOLIBRI_HOME
 
-# Use a separate content URL if configured.
+cp "${EKB_DATA_DIR}/kolibri/options.ini" "${EKB_DATA_DIR}/kolibri/automatic_provision.json" -t "${KOLIBRI_HOME}"
+
+# Use a separate content URL, if configured.
 if [ -n "${EKB_KOLIBRI_CENTRAL_CONTENT_BASE_URL}" ]; then
   KOLIBRI_CENTRAL_CONTENT_BASE_URL="${EKB_KOLIBRI_CENTRAL_CONTENT_BASE_URL}"
   export KOLIBRI_CENTRAL_CONTENT_BASE_URL
