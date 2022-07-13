@@ -40,11 +40,7 @@ endless_key_usb_image_workspace() {
 endless_key_usb_image_workspace "$@"
 
 # Copy Windows launcher
-launcher_url=$(
-  curl -sSL https://api.github.com/repos/endlessm/windows-usb-launcher/releases/latest |
-  jq -r '.assets[] | select(.name == "Endless.Key.Launcher.exe") | .browser_download_url'
-)
-ekb_download_file "${launcher_url}" "${EKB_CONTENT_DIR}/Endless Key Launcher.exe"
+download_github_release_file "endlessm/windows-usb-launcher" "v${EKB_WIN_USB_LAUNCHER_VERSION}" "Endless.Key.Launcher.exe" "${EKB_CONTENT_DIR}/Endless Key Launcher.exe"
 cp "${EKB_CONTENT_DIR}/Endless Key Launcher.exe" "${EKB_TARGET_DIR}/Endless Key Launcher.exe"
 
 
