@@ -119,13 +119,8 @@ if [ -n "${EKB_KOLIBRI_CONTENT_PLACEHOLDERS}" ]; then
 fi
 
 # Generate index files for zim files in ${KOLIBRI_HOME}
-
-endless_key_kolibri_content_generate_zim_index() {
-  find "${KOLIBRI_HOME}/content/storage" -name "*.zim" \
+find "${KOLIBRI_HOME}/content/storage" -name "*.zim" \
   | xargs -n 1 python3 "${EKB_HELPERS_DIR}/generate-zimply-index"
-}
-
-endless_key_kolibri_content_generate_zim_index "$@"
 
 # Empty the user database, and ensure that each instance of this image has a
 # unique Facility ID.
