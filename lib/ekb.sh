@@ -35,6 +35,20 @@ ekb_download_file() {
   fi
 }
 
+# Download a file attached to the GitHub release associated with a tag
+ekb_download_github_release_file() {
+  local repo=${1:?No repo supplied to ${FUNCNAME}}
+  local tag=${2:?No tag supplied to ${FUNCNAME}}
+  local filename=${3:?No filename supplied to ${FUNCNAME}}
+  local output=${4:?No output supplied to ${FUNCNAME}}
+  local url=$(
+    curl -sSL https://api.github.com/repos/"${repo}"/releases/tags/"${tag}" |
+    jq -r ".assets[] | select(.name == \"${filename}\") | .browser_download_url"
+  )
+
+  ekb_download_file "$url" "$output"
+}
+
 # Compress a directory according to the configured compression type.
 ekb_compress_dir() {
   pushd "${1}"

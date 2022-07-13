@@ -4,23 +4,10 @@
 
 readme_url=https://images-dl.endlessm.com/endless-key/README.pdf
 
-download_github_release_file() {
-  local repo=${1:?No repo supplied to ${FUNCNAME}}
-  local version=${2:?No version supplied to ${FUNCNAME}}
-  local filename=${3:?No filename supplied to ${FUNCNAME}}
-  local output=${4:?No output supplied to ${FUNCNAME}}
-  local url=$(
-    curl -sSL https://api.github.com/repos/"${repo}"/releases/tags/"${version}" |
-    jq -r ".assets[] | select(.name == \"${filename}\") | .browser_download_url"
-  )
-
-  ekb_download_file "$url" "$output"
-}
-
 endless_key_usb_image_workspace() {
   # Download Software packages
   ekb_download_file "$readme_url" "${EKB_CONTENT_DIR}/README.pdf"
-  download_github_release_file "endlessm/endless-key-app" "v${EKB_ENDLESS_KEY_APP_VERSION}" "kolibri-windows.zip" "${EKB_CONTENT_DIR}/kolibri-windows.zip"
+  ekb_download_github_release_file "endlessm/endless-key-app" "v${EKB_ENDLESS_KEY_APP_VERSION}" "kolibri-windows.zip" "${EKB_CONTENT_DIR}/kolibri-windows.zip"
 
   # Copy README
   rm -f "${EKB_TARGET_DIR}/Quick Start Guide.pdf"
@@ -40,7 +27,7 @@ endless_key_usb_image_workspace() {
 endless_key_usb_image_workspace "$@"
 
 # Copy Windows launcher
-download_github_release_file "endlessm/windows-usb-launcher" "v${EKB_WIN_USB_LAUNCHER_VERSION}" "Endless.Key.Launcher.exe" "${EKB_CONTENT_DIR}/Endless Key Launcher.exe"
+ekb_download_github_release_file "endlessm/windows-usb-launcher" "v${EKB_WIN_USB_LAUNCHER_VERSION}" "Endless.Key.Launcher.exe" "${EKB_CONTENT_DIR}/Endless Key Launcher.exe"
 cp "${EKB_CONTENT_DIR}/Endless Key Launcher.exe" "${EKB_TARGET_DIR}/Endless Key Launcher.exe"
 
 
