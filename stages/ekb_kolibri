@@ -39,7 +39,12 @@ unzip -o -d "${KOLIBRI_HOME}/extensions/kolibri_explore_plugin" "${EKB_TMP_DIR}/
 
 ## Populate KOLIBRI_HOME
 
-cp "${EKB_DATA_DIR}/kolibri/options.ini" "${EKB_DATA_DIR}/kolibri/automatic_provision.json" -t "${KOLIBRI_HOME}"
+cp "${EKB_DATA_DIR}/kolibri/automatic_provision.json" -t "${KOLIBRI_HOME}"
+sed 's/$/\r/' <<OPTIONS_INI  > "${KOLIBRI_HOME}"/options.ini
+[Deployment]
+STATIC_USE_SYMLINKS = 0
+PROJECT = endless-key-${EKB_CODENAME}
+OPTIONS_INI
 
 # Use a separate content URL, if configured.
 if [ -n "${EKB_KOLIBRI_CENTRAL_CONTENT_BASE_URL}" ]; then

@@ -3,6 +3,7 @@
 # Ensure basic settings are available from the environment.
 fatal=0
 for var in \
+  EKB_CODENAME \
   EKB_BASELIB \
   EKB_DATA_DIR \
   EKB_HELPERS_DIR \
