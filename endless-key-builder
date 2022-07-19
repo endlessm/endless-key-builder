@@ -80,7 +80,6 @@ class EKB(object):
         'userconfdir',
         'build_dir',
         'tmp_dir',
-        'content_dir',
         'target_dir',
         'out_dir',
         'compression',
@@ -140,7 +139,6 @@ class EKB(object):
 
         self.build_dir = '${src_dir}/build'
         self.tmp_dir = '${build_dir}/tmp'
-        self.content_dir = '${build_dir}/content'
         self.target_dir = '${build_dir}/target'
         self.out_dir = '${build_dir}/out/${build_version}'
 
@@ -215,7 +213,6 @@ class EKB(object):
 
     def run(self):
         # Create necessary work directories
-        recreate_dir(self.content_dir)
         recreate_dir(self.target_dir)
         recreate_dir(self.tmp_dir)
         recreate_dir(self.out_dir)

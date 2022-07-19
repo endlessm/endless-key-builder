@@ -8,7 +8,7 @@ if [ -z "${EKB_KOLIBRI_INSTALL_CHANNELS}" ]; then
   exit 0
 fi
 
-export KOLIBRI_HOME="${EKB_CONTENT_DIR}/kolibri-content"
+export KOLIBRI_HOME="${EKB_TMP_DIR}/kolibri-content"
 ekb_recreate_dir "${KOLIBRI_HOME}"
 
 KOLIBRI_VENV_DIR="${EKB_TMP_DIR}/kolibri-content-venv"
