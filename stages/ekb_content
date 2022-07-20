@@ -5,7 +5,7 @@
 
 ## Install README
 
-readme_url=https://images-dl.endlessm.com/endless-key/README.pdf
+readme_url=https://endless-key.s3.us-west-2.amazonaws.com/README.pdf
 ekb_download_file "$readme_url" "${EKB_TARGET_DIR}/Quick Start Guide.pdf"
 
 
