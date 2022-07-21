@@ -25,5 +25,10 @@ pipeline {
                 }
             }
         }
+        stage('Cleanup') {
+            steps {
+                sh "rm -rfv build"
+            }
+        }
     }
 }
