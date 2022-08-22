@@ -4,6 +4,7 @@
 fatal=0
 for var in \
   EKB_CODENAME \
+  EKB_PROJECT_PREFIX \
   EKB_BASELIB \
   EKB_DATA_DIR \
   EKB_HELPERS_DIR \

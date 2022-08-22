@@ -13,10 +13,12 @@ pipeline {
         }
         stage('Build') {
             steps {
-                sh "./endless-key-builder \"${params.CODENAME}\""
+                /* The "endless-key" project prefix is reserved for Endless OS Foundation.
+                 * Please choose a different prefix if you are a 3rd-party.
+                 */
+                sh "./endless-key-builder --project-prefix=\"endless-key\" \"${params.CODENAME}\""
             }
         }
-
         stage('Publish') {
             steps {
                 script { env.BUILD_VER = sh(script: "ls build/out", returnStdout: true).trim() }

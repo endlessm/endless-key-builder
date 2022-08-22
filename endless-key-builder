@@ -13,6 +13,7 @@ import sys
 
 
 desc = 'Generates a file for creating an Endless Key USB device'
+default_project_prefix = 'ekbcustom'
 
 
 def recreate_dir(path):
@@ -86,6 +87,7 @@ class EKB(object):
         'out_file',
         'configfile',
         'configfullfile',
+        'project_prefix',
     ]
     BOOLEAN_ATTRS = ['dry_run']
 
@@ -113,7 +115,8 @@ class EKB(object):
             # Chain up for normal attribute setting
             super().__setattr__(attr, value)
 
-    def __init__(self, codename, debug=False):
+    def __init__(self, codename, debug=False,
+                 project_prefix=default_project_prefix):
         self.debug = debug
 
         # Create the config option first to allow the proxying between
@@ -125,6 +128,7 @@ class EKB(object):
         # things easily.
 
         self.codename = codename
+        self.project_prefix = project_prefix
         self.build_version = datetime.datetime.utcnow().strftime('%y%m%d-%H%M%S')
 
         self.src_dir = os.path.dirname(os.path.realpath(__file__))
@@ -231,7 +235,11 @@ if __name__ == '__main__':
     argparser.add_argument('CODENAME', help='which configuration to build')
     argparser.add_argument('--debug', help='enable debug output',
                            action='store_true')
+    argparser.add_argument('--project-prefix',
+                           help='set the prefix to be used for the kolibri PROJECT setting',
+                           default=default_project_prefix)
     args = argparser.parse_args()
 
-    builder = EKB(codename=args.CODENAME, debug=args.debug)
+    builder = EKB(codename=args.CODENAME, debug=args.debug,
+                  project_prefix=args.project_prefix)
     builder.run()
