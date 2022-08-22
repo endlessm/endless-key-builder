@@ -42,7 +42,6 @@ unzip -o -d "${KOLIBRI_HOME}/extensions/kolibri_explore_plugin" "${EKB_TMP_DIR}/
 cp "${EKB_DATA_DIR}/kolibri/automatic_provision.json" -t "${KOLIBRI_HOME}"
 sed 's/$/\r/' <<OPTIONS_INI  > "${KOLIBRI_HOME}"/options.ini
 [Deployment]
-STATIC_USE_SYMLINKS = 0
 PROJECT = endless-key-${EKB_CODENAME}
 OPTIONS_INI
 
