@@ -3,6 +3,7 @@
 # Ensure basic settings are available from the environment.
 fatal=0
 for var in \
+  EKB_DRY_RUN \
   EKB_CODENAME \
   EKB_PROJECT_PREFIX \
   EKB_BASELIB \
@@ -41,6 +42,11 @@ done
 if [ $fatal -eq 1 ] ; then
   echo "error: one or more required settings missing, exiting" >&2
   exit 1
+fi
+
+if [ ${EKB_DRY_RUN} == "true" ] ; then
+  echo "Running in dry-run mode, exiting" >&2
+  exit 0
 fi
 
 # Set -ex here so we don't get all the output from the loops above

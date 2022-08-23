@@ -69,6 +69,7 @@ class EKBConfigParser(configparser.ConfigParser):
 class EKB(object):
     # Attributes to be exported to environment
     CONFIG_ATTRS = [
+        'dry_run',
         'codename',
         'build_version',
         'src_dir',
@@ -115,7 +116,7 @@ class EKB(object):
             # Chain up for normal attribute setting
             super().__setattr__(attr, value)
 
-    def __init__(self, codename, debug=False,
+    def __init__(self, codename, dry_run=False, debug=False,
                  project_prefix=default_project_prefix):
         self.debug = debug
 
@@ -127,6 +128,7 @@ class EKB(object):
         # interpolation syntax. This will allow the user to override
         # things easily.
 
+        self.dry_run = dry_run
         self.codename = codename
         self.project_prefix = project_prefix
         self.build_version = datetime.datetime.utcnow().strftime('%y%m%d-%H%M%S')
@@ -166,9 +168,10 @@ class EKB(object):
         ]
         for path in self.config.read(config_files, encoding='utf-8'):
             print(f'Loaded configuration file {path}')
-        with open(self.configfile, 'w') as out:
-            out.write(f'# Configuration for {os.path.basename(self.out_file)}\n')
-            self.config.write(out)
+        if not self.dry_run:
+            with open(self.configfile, 'w') as out:
+                out.write(f'# Configuration for {os.path.basename(self.out_file)}\n')
+                self.config.write(out)
 
         # Additional settings that will not be displayed in the merged
         # configuration file. Useful for credentials and other secrets.
@@ -180,9 +183,10 @@ class EKB(object):
         ]
         for path in self.config.read(config_files, encoding='utf-8'):
             print(f'Loaded private configuration file {path}')
-        with open(self.configfullfile, 'w') as out:
-            out.write(f'# Configuration for {os.path.basename(self.out_file)}\n')
-            self.config.write(out)
+        if not self.dry_run:
+            with open(self.configfullfile, 'w') as out:
+                out.write(f'# Configuration for {os.path.basename(self.out_file)}\n')
+                self.config.write(out)
 
     def setenv(self, section, option, value):
         """Export config values as variable in EKB namespace
@@ -216,10 +220,11 @@ class EKB(object):
                 self.setenv(sect, option, value)
 
     def run(self):
-        # Create necessary work directories
-        recreate_dir(self.target_dir)
-        recreate_dir(self.tmp_dir)
-        recreate_dir(self.out_dir)
+        if not self.dry_run:
+            # Create necessary work directories
+            recreate_dir(self.target_dir)
+            recreate_dir(self.tmp_dir)
+            recreate_dir(self.out_dir)
 
         self.configure()
         if self.debug:
@@ -235,11 +240,13 @@ if __name__ == '__main__':
     argparser.add_argument('CODENAME', help='which configuration to build')
     argparser.add_argument('--debug', help='enable debug output',
                            action='store_true')
+    argparser.add_argument('--dry-run', help='do not download or build anything',
+                           action='store_true')
     argparser.add_argument('--project-prefix',
                            help='set the prefix to be used for the kolibri PROJECT setting',
                            default=default_project_prefix)
     args = argparser.parse_args()
 
-    builder = EKB(codename=args.CODENAME, debug=args.debug,
-                  project_prefix=args.project_prefix)
+    builder = EKB(codename=args.CODENAME, dry_run=args.dry_run,
+                  debug=args.debug, project_prefix=args.project_prefix)
     builder.run()
