@@ -1,9 +1,9 @@
 # Dockerfile for running endless-key-builder
 
-# Start from the eos image in our private repo. To use a different
+# Start from the eos image in our public repo. To use a different
 # version than EOS master, pass --build-arg=branch=eosX.Y.
 ARG branch=master
-FROM registry.endlessm-sf.com/eos:${branch}
+FROM docker.io/endlessm/eos:${branch}
 
 # Install dependencies. Any additional packages can be added in the packages
 # build argument.
