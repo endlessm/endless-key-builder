@@ -1,4 +1,4 @@
-Endless Key Builder (EIB)
+Endless Key Builder (EKB)
 =========================
 
 This program assembles an archive file that can be used to create physical
