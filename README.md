@@ -69,6 +69,12 @@ files read in is:
 The host and user configuration files are not typically used. They can allow
 for a permanent or temporary override for a particular host or user.
 
+Next, a local tree of configuration can be loaded from `$localdir/config` if a
+local settings directory is specified with the `--localdir` option. The
+configuration loaded here is the same as in the `config` directory in the
+source tree. For example, `$localdir/config/defaults.ini` and
+`$localdir/config/codename/$codename.ini` will be loaded.
+
 Finally, there are extra configuration files whose settings will be used during
 the build but not displayed in the saved configuration file:
 

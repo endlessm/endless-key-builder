@@ -117,7 +117,7 @@ class EKB(object):
             super().__setattr__(attr, value)
 
     def __init__(self, codename, dry_run=False, debug=False,
-                 project_prefix=default_project_prefix):
+                 localdir=None, project_prefix=default_project_prefix):
         self.debug = debug
 
         # Create the config option first to allow the proxying between
@@ -142,6 +142,17 @@ class EKB(object):
         self.configdir = '${src_dir}/config'
         self.sysconfdir = '/etc/endless-key-builder'
         self.userconfdir = f'{os.path.expanduser("~")}/.config/endless-key-builder'
+        if localdir:
+            self.localdir = os.path.abspath(localdir)
+            self.local_configdir = os.path.join(self.localdir, 'config')
+
+            # Expose the local directory in the configuration for use in
+            # interpolation. This has to be done manually here because the
+            # automatic proxying (via CONFIG_ATTRS) does not work when the
+            # value is None, as in the `else` branch of this `if`.
+            self.config.set(None, 'localdir', self.localdir)
+        else:
+            self.localdir = self.local_configdir = None
 
         self.build_dir = '${src_dir}/build'
         self.tmp_dir = '${build_dir}/tmp'
@@ -161,11 +172,22 @@ class EKB(object):
             os.path.join(self.configdir, 'defaults.ini'),
             # Codename settings
             os.path.join(self.configdir, 'codename', f'{self.codename}.ini'),
+        ]
+        if self.local_configdir:
+            config_files.extend([
+                # Default settings from localdir
+                os.path.join(self.local_configdir, 'defaults.ini'),
+                # Codename settings from localdir
+                os.path.join(self.local_configdir, 'codename',
+                             f'{self.codename}.ini'),
+            ])
+        config_files.extend([
             # Host settings
             os.path.join(self.sysconfdir, 'config.ini'),
             # User settings
             os.path.join(self.userconfdir, 'config.ini'),
-        ]
+        ])
+
         for path in self.config.read(config_files, encoding='utf-8'):
             print(f'Loaded configuration file {path}')
         if not self.dry_run:
@@ -175,12 +197,17 @@ class EKB(object):
 
         # Additional settings that will not be displayed in the merged
         # configuration file. Useful for credentials and other secrets.
-        config_files = [
+        config_files = []
+        if self.local_configdir:
+            config_files.extend([
+                os.path.join(self.local_configdir, 'private.ini'),
+            ])
+        config_files.extend([
             # Host settings
             os.path.join(self.sysconfdir, 'private.ini'),
             # User settings
             os.path.join(self.userconfdir, 'private.ini'),
-        ]
+        ])
         for path in self.config.read(config_files, encoding='utf-8'):
             print(f'Loaded private configuration file {path}')
         if not self.dry_run:
@@ -238,6 +265,7 @@ class EKB(object):
 if __name__ == '__main__':
     argparser = ArgumentParser(description=desc)
     argparser.add_argument('CODENAME', help='which configuration to build')
+    argparser.add_argument('--localdir', help='local settings directory')
     argparser.add_argument('--debug', help='enable debug output',
                            action='store_true')
     argparser.add_argument('--dry-run', help='do not download or build anything',
@@ -248,5 +276,6 @@ if __name__ == '__main__':
     args = argparser.parse_args()
 
     builder = EKB(codename=args.CODENAME, dry_run=args.dry_run,
-                  debug=args.debug, project_prefix=args.project_prefix)
+                  debug=args.debug, localdir=args.localdir,
+                  project_prefix=args.project_prefix)
     builder.run()
