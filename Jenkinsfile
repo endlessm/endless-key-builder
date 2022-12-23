@@ -11,12 +11,21 @@ pipeline {
                 buildDescription "${params.CODENAME} ${params.SRC_BRANCH}"
             }
         }
+        stage('Checkout config') {
+            steps {
+                dir('endless-key-config') {
+                    git branch: "${params.CONFIG_BRANCH}",
+                        credentialsId: "github-ssh-ro",
+                        url: "git@github.com:endlessm/endless-key-config.git"
+                }
+            }
+        }
         stage('Build') {
             steps {
                 /* The "endless-key" project prefix is reserved for Endless OS Foundation.
                  * Please choose a different prefix if you are a 3rd-party.
                  */
-                sh "./endless-key-builder --project-prefix=\"endless-key\" \"${params.CODENAME}\""
+                sh "./endless-key-builder --project-prefix=\"endless-key\" --localdir=\"./endless-key-config\" \"${params.CODENAME}\""
             }
         }
         stage('Publish') {
@@ -29,7 +38,7 @@ pipeline {
         }
         stage('Cleanup') {
             steps {
-                sh "rm -rfv build"
+                sh "rm -rfv build endless-key-config"
             }
         }
     }
